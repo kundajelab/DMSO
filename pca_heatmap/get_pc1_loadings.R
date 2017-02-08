@@ -1,0 +1,14 @@
+rm(list=ls())
+#library(ggbiplot)
+library(data.table)
+#data=data.frame(read.table('presence_tasks_stringent.txt',header=T,sep='\t'))
+data=data.frame(read.table('macs.fc.averaged.cellcycleonly.tab',header=T,sep='\t'))
+#data$Chrom=NULL
+#data$Start=NULL 
+#data$End=NULL 
+data.pca=prcomp(t(data),center=FALSE,scale=FALSE)
+dense_treatment_groups=factor(c("Co_HD","Co_HD","Tr_HD","Tr_HD","Co_LD","Co_LD","Tr_LD","Tr_LD",
+                                "Co_HD","Co_HD","Tr_HD","Tr_HD","Co_LD","Co_LD","Tr_LD","Tr_LD",
+                                "Co_HD","Co_HD","Tr_HD","Tr_HD","Co_LD","Co_LD","Tr_LD","Tr_LD"))
+plot(data.pca$x[,c(1,2)],col=dense_treatment_groups,pch=16)
+text(data.pca$x[,c(1,2)],labels=groups,pos=3,cex=0.5)
