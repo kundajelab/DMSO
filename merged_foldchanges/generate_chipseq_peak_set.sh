@@ -1,7 +1,6 @@
 module load bedtools 
 
-#concatenate the naive overlap files for the chipseq pipeline outputs
-cat h3k27ac_noncellcycle_control/out/peak/macs2/pooled_pseudo_reps/*bed h3k27ac_noncellcycle_dmso/out/peak/macs2/pooled_pseudo_reps/*bed  h3k27me3_noncellcycle_control/out/peak/macs2/pooled_pseudo_reps/*bed  h3k27me3_noncellcycle_dmso/out/peak/macs2/pooled_pseudo_reps/*bed h3k4me3_noncellcycle_control/out/peak/macs2/overlap/*narrowPeak h3k4me3_noncellcycle_dmso/out/peak/macs2/overlap/*narrowPeak > chetty_chipseq_aggregate_files_cated_narrowPeak.bed 
+#concatenate the naive overlap files for the chipseq pipeline outputs cat h3k27ac_noncellcycle_control/out/peak/macs2/pooled_pseudo_reps/*bed h3k27ac_noncellcycle_dmso/out/peak/macs2/pooled_pseudo_reps/*bed  h3k27me3_noncellcycle_control/out/peak/macs2/pooled_pseudo_reps/*bed  h3k27me3_noncellcycle_dmso/out/peak/macs2/pooled_pseudo_reps/*bed h3k4me3_noncellcycle_control/out/peak/macs2/overlap/*narrowPeak h3k4me3_noncellcycle_dmso/out/peak/macs2/overlap/*narrowPeak > chetty_chipseq_aggregate_files_cated_narrowPeak.bed 
 
 #sort 
 bedtools sort -i chetty_chipseq_aggregate_files_cated_narrowPeak.bed > chetty_chipseq_aggregate_files_cated_narrowPeak.sorted.bed
