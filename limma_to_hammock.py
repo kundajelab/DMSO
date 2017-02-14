@@ -1,12 +1,16 @@
 #converts the output of limma voom differential analysis to a hammock file
 import argparse
 import json
+import sys
 
 def parse_args():
     parser=argparse.ArgumentParser(description="Provide a .tsv file containing limma voom analysis result to generate hammock track that can be visualized in Washu browser")
     parser.add_argument('--voom_file',help='limma voom file in tab-separated format')
     parser.add_argument('--output_file',help='name of output file to generate')
     parser.add_argument('--coord_column',help='name of column header in voom file that stores the chromosome_start_end coordinates')
+    if len(sys.argv)==1:
+        parser.print_help()
+        sys.exit(1) 
     return parser.parse_args()
 def main():
     args=parse_args()

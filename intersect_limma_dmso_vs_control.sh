@@ -1,0 +1,13 @@
+#ATAC_SEQ
+#python intersect_limma_dmso_vs_control.py --dmso_file atac_differential_lateg1_earlyg1_dmso.tsv --control_file atac_differential_lateg1_earlyg1_control.tsv --outf atac_differential_lateg1_earlyg1_combined.tsv
+
+#python intersect_limma_dmso_vs_control.py --dmso_file atac_differential_sg2m_lateg1_dmso.tsv --control_file atac_differential_sg2m_lateg1_control.tsv --outf atac_differential_sg2m_lateg1_combined.tsv
+
+#python intersect_limma_dmso_vs_control.py --dmso_file atac_differential_earlyg1_sg2m_dmso.tsv --control_file atac_differential_earlyg1_sg2m_control.tsv --outf atac_differential_earlyg1_sg2m_combined.tsv
+
+#RNA_SEQ
+python intersect_limma_dmso_vs_control.py --dmso_file rna_differential_lateg1_earlyg1_dmso.tsv --control_file rna_differential_lateg1_earlyg1_control.tsv --outf rna_differential_lateg1_earlyg1_combined.tsv
+
+python intersect_limma_dmso_vs_control.py --dmso_file rna_differential_sg2m_lateg1_dmso.tsv --control_file rna_differential_sg2m_lateg1_control.tsv --outf rna_differential_sg2m_lateg1_combined.tsv
+
+python intersect_limma_dmso_vs_control.py --dmso_file rna_differential_earlyg1_sg2m_dmso.tsv --control_file rna_differential_earlyg1_sg2m_control.tsv --outf rna_differential_earlyg1_sg2m_combined.tsv
