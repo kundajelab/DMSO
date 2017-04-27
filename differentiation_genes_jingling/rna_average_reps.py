@@ -1,7 +1,9 @@
 import numpy as np 
-data=open('rsem.fpkm.differentiation_genes.csv','r').read().split('\n')
+#data=open('rsem.fpkm.differentiation_genes.csv','r').read().split('\n')
+data=open('accessible_earlyg1_differential_late/RSEM.filtered.tsv','r').read().split('\n')
 header=data[0].split('\t')
-outf=open('rsem.fpkm.differentiation_genes.averaged.reps.tsv','w')
+#outf=open('rsem.fpkm.differentiation_genes.averaged.reps.tsv','w')
+outf=open('accessible_earlyg1_differential_late/RSEM.filtered.averaged.reps.tsv','w')
 outf.write('Gene\tControl_earlyG1\tControl_lateG1\tControl_SG2M\tDMSO_earlyG1\tDMSO_lateG1\tDMSO_SG2M\n')
 for line in data[1::]:
     tokens=line.split('\t')

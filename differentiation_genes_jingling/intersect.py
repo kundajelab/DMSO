@@ -1,4 +1,5 @@
-genes=open('differentiation_genes.gtf','r').read().strip().split('\n')
+#genes=open('differentiation_genes.gtf','r').read().strip().split('\n')
+genes=open('accessible_earlyg1_differential_late/genes.gtf','r').read().strip().split('\n')
 gene_dict=dict()
 for line in genes:
     tokens=line.split('\t')
@@ -19,7 +20,7 @@ for line in atac_peaks[1::]:
         gene_chrom=gene_dict[gene][0]
         gene_start=gene_dict[gene][1]
         if gene_chrom==chrom:
-            if abs(start-gene_start)< 5000:
+            if abs(start-gene_start)< 10000:
                 print(gene+'\t'+line)
                 break
 

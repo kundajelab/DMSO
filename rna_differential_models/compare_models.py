@@ -23,7 +23,10 @@ def main():
                 print("not found:"+str(model)+str(task)+".tsv")
                 continue 
             header=data[0].split('\t')
-            gene_index=header.index("Chrom_Start_End")
+            try:
+                gene_index=header.index("Chrom_Start_End")
+            except:
+                continue 
             if task in header:
                 fc_index=header.index(task)
             else:

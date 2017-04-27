@@ -1,14 +1,10 @@
 rm(list=ls())
 library(limma)
-library(devtools)
-library(Biobase)
 library(sva)
-library(bladderbatch)
-library(snpStats)
 library(data.table)
 
 ## SVA ANALYSIS FOR TPM DATA
-data=data.frame(read.table('rsem.tpm.csv',header=TRUE,sep='\t'))
+data=data.frame(read.table('../rsem.tpm.csv',header=TRUE,sep='\t'))
 
 #keep track of the gene names in a variable 
 unique_names=data$GENE
@@ -31,20 +27,24 @@ batches=data.frame(read.table('rnaseq_batches.txt',header=TRUE,sep='\t'))
 mod1=model.matrix(~0+Treatment+Timepoint,data=batches)
 mod0=model.matrix(~1,data=batches)
 
-#svaseq -- svaseq must be used with non-normalized data 
-sva.obj=svaseq(data,mod1,mod0)
+#svaseq -- sva must be used with normalized data 
+sva.obj=sva(data,mod1,mod0)
 sva.obj=data.frame(sva.obj$sv)
 sva.obj$exp_X1=exp(sva.obj$X1)
 sva.obj$exp_X2=exp(sva.obj$X2)
+sva.obj$exp_X3=exp(sva.obj$X3)
+
 batches$sva1=sva.obj$X1
 batches$sva2=sva.obj$X2
+batches$sva3=sva.obj$X3
+
 batches$exp_sva1=sva.obj$exp_X1
 batches$exp_sva2=sva.obj$exp_X2 
-
+batches$exp_sva3=sva.obj$exp_X3
 
 #add in surrogate variables into the model matrix 
-mod2=model.matrix(~0+Sample+sva1+sva2,data=batches)
-mod3=model.matrix(~0+Sample+exp_sva1+exp_sva2,data=batches)
+mod2=model.matrix(~0+Sample+sva1+sva2+sva3,data=batches)
+mod3=model.matrix(~0+Sample+exp_sva1+exp_sva2+exp_sva3,data=batches)
 
 #specify the contrasts 
 cont.matrix=makeContrasts(earlyg1_dmso_control="Samplet.earlyG1-Samplec.earlyG1",
@@ -88,8 +88,10 @@ gene_names=unique_names
 for(i in c(1,2,3,4,5,6,7,8,9))
 {
   tab<-topTable(e2, number=nrow(data),coef=i,lfc=1,p.value = 0.05)
+  if(nrow(tab)>0){
   names(tab)[1]=comparisons[i]
   tab$Chrom_Start_End=rownames(tab)
+  }
   write.table(tab,file=paste("rna_differential_limma_tpm",comparisons[i],".tsv",sep=""),quote=TRUE,sep='\t',row.names = FALSE)
 }
 
@@ -97,8 +99,10 @@ comparisons=colnames(cont.matrix_exp)
 for(i in c(1,2,3,4,5,6,7,8,9))
 {
   tab<-topTable(e3, number=nrow(data),coef=i,lfc=1,p.value = 0.05)
+  if(nrow(tab)>0){
   names(tab)[1]=comparisons[i]
   tab$Chrom_Start_End=rownames(tab)
+  }
   write.table(tab,file=paste("rna_differential_limma_exp_tpm",comparisons[i],".tsv",sep=""),quote=TRUE,sep='\t',row.names = FALSE)
 }
 

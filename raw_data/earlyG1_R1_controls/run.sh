@@ -1,0 +1,1 @@
+/srv/scratch/annashch/bds_atac/atac.bds -out_dir out -pe -filt_bam1 out/align/rep1/H9_Fucci_earlyG1_C1_S23_L004_R1_001.trim.PE2SE.nodup.bam -bam2 out/align/rep2/H9_Fucci_earlyG1_C2_S24_L004_R1_001.trim.PE2SE.bam -species hg19  -pseudorep -idr  -blacklist_idr /srv/gsfs0/projects/kundaje/users/annashch/refs/wgEncodeDacMapabilityConsensusExcludable.bed -nth 4
