@@ -31,7 +31,7 @@ def main():
         dictionaries.append(cur_dict)
     print("Generated dictionaries of values!")
     #print(str(dictionaries))
-    pdb.set_trace()
+    #pdb.set_trace()
     
     #Now, merge into a single file
     merged=dict()

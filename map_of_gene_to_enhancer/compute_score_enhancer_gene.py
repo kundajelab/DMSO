@@ -12,14 +12,14 @@ def parse_args():
     parser.add_argument("--promoter_to_gene")
     parser.add_argument("--h3k27ac_bdg_file")
     parser.add_argument("--atac_limma_file")
-    parser.add_argument("--atac_limma_column",type=int)
     parser.add_argument("--atac_rpm_file")
     parser.add_argument("--atac_rpm_column",type=int) 
     parser.add_argument("--nij_hic_base_dir")
     parser.add_argument("--hic_resolution",type=int,default=40000)
     parser.add_argument("--hic_suffix",default=".sparse_map")
     parser.add_argument("--outf")
-    parser.add_argument("--runall",action="store_true")
+    parser.add_argument("--tads") 
+    parser.add_argument("--runall",action="store_true",default=False)
     return parser.parse_args() 
 
 #NOTE: THIS ASSUMES THE HUMAN GENOME, CHANGE THE CHROMOSOME RANGE FOR NON-HUMAN GENOME!!
@@ -44,52 +44,124 @@ def make_contact_map(nij_base_dir,hic_resolution,suffix):
         print("built contact map for chromosome:"+str(chrom))
     return contact_map 
 
-def get_hic_bin_to_gene(promoter_to_gene_file,gene_list,hic_resolution):
+def get_tad_to_gene(gene_dict,tad_dict):
+    for gene in gene_dict:
+        try:
+            chrom=gene_dict[gene][0]
+        except:
+            pdb.set_trace() 
+        pos=gene_dict[gene][1]
+        options=tad_dict[chrom]
+        for entry in options:
+            if ((pos>=entry[0]) and (pos <=entry[1])):
+                #assign gene to tad
+                if 'genes' not in tad_dict[chrom][entry]:
+                    tad_dict[chrom][entry]['genes']=[]
+                tad_dict[chrom][entry]['genes'].append(tuple([gene,chrom,pos]))
+                break
+    return tad_dict 
+
+def get_tad_to_peak(atac_limma_file,tad_dict):
+    peaks=open(atac_limma_file,'r').read().strip().split('\n')
+    for line in peaks[1::]:
+        tokens=line.split('\t')
+        peak_pos=tokens[-1].replace('"','').split('_')
+        chrom=peak_pos[0]
+        start=int(peak_pos[1])
+        end=int(peak_pos[2])
+        options=tad_dict[chrom]
+        for entry in options:
+            if ((start>=entry[0]) and (end <=entry[1])):
+                #assign the peak to tad
+                if 'peaks' not in tad_dict[chrom][entry]:
+                    tad_dict[chrom][entry]['peaks']=[]
+                tad_dict[chrom][entry]['peaks'].append(tuple([chrom,start,end]))
+                break
+        return tad_dict 
+
+#find cases of single gene and/or peak in tad 
+def get_clear_peak_gene_assoc(tad_dict):
+    clear_assoc=[]
+    ambiguous_peaks=[]
+    ambiguous_genes=[]
+    
+    for chrom in tad_dict:
+        for entry in tad_dict[chrom]:
+            if (('genes' in tad_dict[chrom][entry]) and('peaks' in tad_dict[chrom][entry])):
+                num_genes=len(tad_dict[chrom][entry]['genes'])
+                num_peaks=len(tad_dict[chrom][entry]['peaks'])
+                if ((num_genes==1) or (num_peaks ==1)):
+                    #there is a clear association
+                    for gene in tad_dict[chrom][entry]['genes']:
+                        for peak in tad_dict[chrom][entry]['peaks']:
+                            assoc=tuple([gene,peak])
+                            clear_assoc.append(assoc)
+                else:
+                    for gene in tad_dict[chrom][entry]['genes']:
+                        ambiguous_genes.append(gene) 
+                    for peak in tad_dict[chrom][entry]['peaks']:
+                        ambiguous_peaks.append(peak)
+    return clear_assoc,ambiguous_peaks,ambiguous_genes 
+                
+    
+    
+def get_gene_pos(gene_file,promoter_to_gene_file):
+    gene_list=open(gene_file,'r').read().strip().split('\n')
     gene_dict=dict()
     for gene in gene_list:
-        gene_dict[gene]=1 
-    data=open(promoter_to_gene_file,'r').read().strip().split('\n')
-    hic_bin_to_gene=dict()
+        gene_dict[gene]=[]
+    data=open(promoter_to_gene_file,'r').read().replace('\r','').strip().split('\n')
     for line in data:
         tokens=line.split('\t')
         chrom=tokens[0]
         pos=int(tokens[1])
         gene_name=tokens[4]
+        if gene_name=="":
+            pdb.set_trace()
+            
         if gene_name in gene_dict:
-            #get the hic bin
-            hic_bin=pos/hic_resolution
-            if chrom not in hic_bin_to_gene:
-                hic_bin_to_gene[chrom]=dict()
-            if hic_bin not in hic_bin_to_gene[chrom]:
-                hic_bin_to_gene[chrom][hic_bin]=[gene_name]
-            else:
-                hic_bin_to_gene[chrom][hic_bin].append(gene_name)
+            gene_dict[gene_name]=[chrom,pos]
+    for gene in gene_dict:
+        if gene_dict[gene]==[]:
+            print(str(gene))
+    return gene_dict 
+
+
+def get_hic_bin_to_gene(gene_list,hic_resolution):
+    hic_bin_to_gene=dict()
+    for entry in gene_list:
+        gene_name=entry[0]
+        chrom=entry[1]
+        pos=entry[2]
+        #get the hic bin
+        hic_bin=pos/hic_resolution
+        if chrom not in hic_bin_to_gene:
+            hic_bin_to_gene[chrom]=dict()
+        if hic_bin not in hic_bin_to_gene[chrom]:
+            hic_bin_to_gene[chrom][hic_bin]=[gene_name]
+        else:
+            hic_bin_to_gene[chrom][hic_bin].append(gene_name)
     return hic_bin_to_gene
 
-def get_hic_bin_to_peak(atac_limma_file,atac_limma_column,hic_resolution):
+def get_hic_bin_to_peak(peak_list,hic_resolution):
     hic_bin_to_peak=dict()
-    peak_file=open(atac_limma_file,'r').read().strip().split('\n')
-    for line in peak_file[1::]: #first line is header that should be skipped
-        tokens=line.split('\t')
-        chrom=tokens[0]
-        start=int(tokens[1])
-        end=int(tokens[2])
-        peak=chrom+"_"+str(start)+"_"+str(end)
-        fc=float(tokens[atac_limma_column])
-        if abs(fc)>=1:
-            bin1=start/hic_resolution
-            bin2=end/hic_resolution
-            if chrom not in hic_bin_to_peak:
-                hic_bin_to_peak[chrom]=dict()
-            if bin1 not in hic_bin_to_peak[chrom]:
-                hic_bin_to_peak[chrom][bin1]=[peak]
+    for peak in peak_list:
+        chrom=peak[0]
+        start=peak[1]
+        end=peak[2]
+        bin1=start/hic_resolution
+        bin2=end/hic_resolution
+        if chrom not in hic_bin_to_peak:
+            hic_bin_to_peak[chrom]=dict()
+        if bin1 not in hic_bin_to_peak[chrom]:
+            hic_bin_to_peak[chrom][bin1]=[peak]
+        else:
+            hic_bin_to_peak[chrom][bin1].append(peak)
+        if bin2!=bin1: #store the peak again in bin2
+            if bin2 not in hic_bin_to_peak[chrom]:
+                hic_bin_to_peak[chrom][bin2]=[peak]
             else:
-                hic_bin_to_peak[chrom][bin1].append(peak)
-            if bin2!=bin1: #store the peak again in bin2
-                if bin2 not in hic_bin_to_peak[chrom]:
-                    hic_bin_to_peak[chrom][bin2]=[peak]
-                else:
-                    hic_bin_to_peak[chrom][bin2].append(peak)
+                hic_bin_to_peak[chrom][bin2].append(peak)
     return hic_bin_to_peak
 
 def get_atac_rpm(atac_rpm_file,atac_rpm_column):
@@ -179,26 +251,27 @@ def get_predicted_impact(contact_map,hic_bin_to_gene,hic_bin_to_peak,peak_inters
                             continue
     return impact_scores
 
+def load_tads(tad_file):
+    tad_dict=dict()
+    data=open(tad_file,'r').read().strip().split('\n')
+    for line in data:
+        tokens=line.split('\t')
+        chrom=tokens[0]
+        start=int(tokens[1])
+        end=int(tokens[2])
+        if chrom not in tad_dict:
+            tad_dict[chrom]=dict()
+        tad_dict[chrom][tuple([start,end])]=dict() 
+    return tad_dict 
+
 def main():
     args=parse_args()
     if args.runall==True: 
-        genes=open(args.gene_list,'r').read().strip().split('\n')
         #things associated with hi-c contact distance
-
         contact_map=make_contact_map(args.nij_hic_base_dir,args.hic_resolution,args.hic_suffix)
         print("loaded contact map!")
         pickle.dump(contact_map,open("contact_map.npy",'wb'),protocol=2)
         print("save contact map!")
-
-        hic_bin_to_gene=get_hic_bin_to_gene(args.promoter_to_gene,genes,args.hic_resolution)
-        print("got hic bins for genes")
-        pickle.dump(hic_bin_to_gene,open("hic_bin_to_gene.npy",'wb'),protocol=2)
-        print("saved hic_bin_to_gene")
-
-        hic_bin_to_peak=get_hic_bin_to_peak(args.atac_limma_file,args.atac_limma_column,args.hic_resolution) 
-        print("got hic bins for peaks")
-        pickle.dump(hic_bin_to_peak,open("hic_bin_to_peak.npy",'wb'),protocol=2)
-        print("saved hic_bin_to_peak")
 
         #get the atac rpm    
         atac_rpm=get_atac_rpm(args.atac_rpm_file,args.atac_rpm_column)
@@ -221,22 +294,45 @@ def main():
 
     else: 
         contact_map=pickle.load(open("contact_map.npy","rb"))
-        hic_bin_to_gene=pickle.load(open("hic_bin_to_gene.npy","rb"))
-        hic_bin_to_peak=pickle.load(open("hic_bin_to_peak.npy","rb"))
+        #hic_bin_to_gene=pickle.load(open("hic_bin_to_gene.npy","rb"))
+        #hic_bin_to_peak=pickle.load(open("hic_bin_to_peak.npy","rb"))
         atac_rpm=pickle.load(open("atac_rpm.npy","rb"))
         h3k27ac_rpm=pickle.load(open("h3k27ac_rpm.npy","rb"))
         peak_intersection=pickle.load(open("peak_intersection.npy","rb"))
         print("loaded all numpy pickles with intermediate metrics")
 
+    gene_dict=get_gene_pos(args.gene_list,args.promoter_to_gene)
+    print("got gene positions")
+        
+
+    #initial hash of tad--> peak, gene 
+    tad_dict=load_tads(args.tads)
+    tad_dict=get_tad_to_gene(gene_dict,tad_dict)
+    tad_dict=get_tad_to_peak(args.atac_limma_file,tad_dict)
+        
+    #if we have only 1 gene or only 1 peak in a tad -- no ambiguity!
+    clear_assoc,ambiguous_peaks,ambiguous_genes=get_clear_peak_gene_assoc(tad_dict)    
+
+    #if we have multiple peaks and genes in tad, need to resolve the mapping by measuring hic contact frequency
+    hic_bin_to_gene=get_hic_bin_to_gene(ambiguous_genes,args.hic_resolution)
+    print("got hic bins for genes")
+
+    hic_bin_to_peak=get_hic_bin_to_peak(ambiguous_peaks,args.hic_resolution) 
+    print("got hic bins for peaks")
     
     #use the intersected peaks to find contact maps !
     impact_scores=get_predicted_impact(contact_map,hic_bin_to_gene,hic_bin_to_peak,peak_intersection)
 
     #save the impact scores to an output file
     outf=open(args.outf,'w')
+    # A score of 'NA' indicates lack of ambiguity --i.e. only 1 gene or 1 peak per tad 
     outf.write('Gene\tPeak\tScore\n')
     for entry in impact_scores:
         outf.write(entry[0]+'\t'+entry[1]+'\t'+str(impact_scores[entry])+'\n')
+    for entry in clear_assoc:
+        gene=entry[0][0]
+        peak='_'.join([str(i) for i in entry[1]])
+        outf.write(gene+'\t'+peak+'\t'+"NA"+'\n')
         
 if __name__=="__main__":
     main()

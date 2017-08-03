@@ -7,7 +7,7 @@ def parse_args():
     parser.add_argument("--tads")
     parser.add_argument("--peaks")
     parser.add_argument("--outf")
-    parser.add_argument("--binsize",type=int,default=5000)
+    parser.add_argument("--binsize",type=int,default=40000)
     return parser.parse_args()
 
 def main():
@@ -20,7 +20,7 @@ def main():
     tad_distribution=dict()
     for tad in tads:
         tokens=tad.split('\t')
-        chrom='chr'+tokens[0]
+        chrom=tokens[0]
         startval=int(tokens[1])
         endval=int(tokens[2])
         if chrom not in tad_dict:
@@ -41,16 +41,13 @@ def main():
             continue 
         startval=int(tokens[1])
         endval=int(tokens[2])
-        startval=binsize*(startval/binsize)
-        while startval not in tad_dict[chrom]:
-            if startval <=0:
-                break 
-            startval=startval - binsize
-        try:
-            upper_bound = tad_dict[chrom][startval]
-            tad_distribution[chrom][startval]+=1
-        except:
-            continue 
+        if chrom in tad_dict:
+            for tad_start in tad_dict[chrom]:
+                if tad_start <= startval:
+                    tad_end=tad_dict[chrom][tad_start]
+                    if tad_end >= endval:
+                        #we have a hit!
+                        tad_distribution[chrom][tad_start]+=1
     print("assigned peaks to tad regions")
 
 

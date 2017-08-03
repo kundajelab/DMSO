@@ -3,7 +3,7 @@ python perform_permutation_test.py --peaks ../atacseq_merged.peaks.bed \
        --tads all.tads.bed \
        --outf atac_permutations
 
-#python perform_permutation_test.py --peaks expressed_genes.bed \
-#       --num_to_sample 413 \
-#       --tads all.tads.bed \
-#       --outf gene_permutations
+python perform_permutation_test.py --peaks expressed_genes.bed \
+       --num_to_sample 413 \
+       --tads all.tads.bed \
+       --outf gene_permutations

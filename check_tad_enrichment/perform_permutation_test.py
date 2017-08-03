@@ -26,7 +26,7 @@ def main():
     tad_distribution=dict()
     for tad in tads:
         tokens=tad.split('\t')
-        chrom='chr'+tokens[0]
+        chrom=tokens[0]
         startval=int(tokens[1])
         endval=int(tokens[2])
         if chrom not in tad_dict:
@@ -51,15 +51,13 @@ def main():
                 continue
             startval=int(tokens[1])
             endval=int(tokens[2])
-            startval=binsize*(startval/binsize)
-            while startval not in tad_dict[chrom]:
-                if startval <=0:
-                    break
-                startval=startval-binsize
-            try:
-                tad_distribution[chrom][startval][cur_sample]+=1
-            except:
-                continue 
+            if chrom in tad_dict:
+                for tad_start in tad_dict[chrom]:
+                    if tad_start <= startval:
+                        tad_end=tad_dict[chrom][tad_start]
+                        if tad_end >= endval:
+                            #we have a hit!
+                            tad_distribution[chrom][tad_start][cur_sample]+=1
         cur_sample+=1
         print(str(cur_sample))
 
@@ -73,4 +71,3 @@ def main():
             
 if __name__=="__main__":
     main()
-    
