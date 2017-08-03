@@ -11,7 +11,7 @@ def parse_args():
     parser.add_argument("--tads")
     parser.add_argument("--outf")
     parser.add_argument("--binsize",type=int,default=5000)
-    parser.add_argument("--num_samples",type=int,default=1000)
+    parser.add_argument("--num_samples",type=int,default=10000)
     return parser.parse_args()
 
 def main():
