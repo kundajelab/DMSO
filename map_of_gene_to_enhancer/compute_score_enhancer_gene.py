@@ -77,7 +77,7 @@ def get_tad_to_peak(atac_limma_file,tad_dict):
                     tad_dict[chrom][entry]['peaks']=[]
                 tad_dict[chrom][entry]['peaks'].append(tuple([chrom,start,end]))
                 break
-        return tad_dict 
+    return tad_dict 
 
 #find cases of single gene and/or peak in tad 
 def get_clear_peak_gene_assoc(tad_dict):
@@ -101,9 +101,14 @@ def get_clear_peak_gene_assoc(tad_dict):
                         ambiguous_genes.append(gene) 
                     for peak in tad_dict[chrom][entry]['peaks']:
                         ambiguous_peaks.append(peak)
+            elif ('genes' in tad_dict[chrom][entry]):
+                for gene in tad_dict[chrom][entry]['genes']:
+                    ambiguous_genes.append(gene)
+            elif ('peaks' in tad_dict[chrom][entry]):
+                for peak in tad_dict[chrom][entry]['peaks']:
+                    ambiguous_peaks.append(peak) 
     return clear_assoc,ambiguous_peaks,ambiguous_genes 
-                
-    
+                    
     
 def get_gene_pos(gene_file,promoter_to_gene_file):
     gene_list=open(gene_file,'r').read().strip().split('\n')
@@ -117,8 +122,7 @@ def get_gene_pos(gene_file,promoter_to_gene_file):
         pos=int(tokens[1])
         gene_name=tokens[4]
         if gene_name=="":
-            pdb.set_trace()
-            
+            pdb.set_trace()            
         if gene_name in gene_dict:
             gene_dict[gene_name]=[chrom,pos]
     for gene in gene_dict:
@@ -169,7 +173,7 @@ def get_atac_rpm(atac_rpm_file,atac_rpm_column):
     atac_rpm=dict()
     for line in data[1::]: #skip header line
         tokens=line.split('\t')
-        peak='_'.join(tokens[0:3])
+        peak='_'.join([str(i) for i in tokens[0:3]])
         value=float(tokens[atac_rpm_column])
         atac_rpm[peak]=value 
     return atac_rpm
@@ -218,8 +222,6 @@ def intersect_h3k27ac_atac(atac_rpm,h3k27ac_rpm):
 
 def get_predicted_impact(contact_map,hic_bin_to_gene,hic_bin_to_peak,peak_intersection):
     impact_scores=dict()
-    #do one chromosome at a time
-    #pdb.set_trace()
     hits=0
     for chrom in hic_bin_to_gene:
         if chrom not in contact_map:
@@ -234,6 +236,7 @@ def get_predicted_impact(contact_map,hic_bin_to_gene,hic_bin_to_peak,peak_inters
                         continue
                     for peak in hic_bin_to_peak[chrom][b2]: 
                     #record the entry if there is a contact across the two bins
+                        peak='_'.join([str(i) for i in peak])
                         if peak not in peak_intersection:
                             continue #we skip the atac peaks that don't have a corresponding h3k27ac peak. 
                         contact_freq=contact_map[chrom][b1][b2]
@@ -266,6 +269,25 @@ def load_tads(tad_file):
 
 def main():
     args=parse_args()
+    gene_dict=get_gene_pos(args.gene_list,args.promoter_to_gene)
+    print("got gene positions")
+        
+
+    #initial hash of tad--> peak, gene 
+    tad_dict=load_tads(args.tads)
+    tad_dict=get_tad_to_gene(gene_dict,tad_dict)
+    tad_dict=get_tad_to_peak(args.atac_limma_file,tad_dict)
+        
+    #if we have only 1 gene or only 1 peak in a tad -- no ambiguity!
+    clear_assoc,ambiguous_peaks,ambiguous_genes=get_clear_peak_gene_assoc(tad_dict)
+
+    #if we have multiple peaks and genes in tad, need to resolve the mapping by measuring hic contact frequency
+    hic_bin_to_gene=get_hic_bin_to_gene(ambiguous_genes,args.hic_resolution)
+    print("got hic bins for genes")
+
+    hic_bin_to_peak=get_hic_bin_to_peak(ambiguous_peaks,args.hic_resolution) 
+    print("got hic bins for peaks")
+    
     if args.runall==True: 
         #things associated with hi-c contact distance
         contact_map=make_contact_map(args.nij_hic_base_dir,args.hic_resolution,args.hic_suffix)
@@ -301,25 +323,6 @@ def main():
         peak_intersection=pickle.load(open("peak_intersection.npy","rb"))
         print("loaded all numpy pickles with intermediate metrics")
 
-    gene_dict=get_gene_pos(args.gene_list,args.promoter_to_gene)
-    print("got gene positions")
-        
-
-    #initial hash of tad--> peak, gene 
-    tad_dict=load_tads(args.tads)
-    tad_dict=get_tad_to_gene(gene_dict,tad_dict)
-    tad_dict=get_tad_to_peak(args.atac_limma_file,tad_dict)
-        
-    #if we have only 1 gene or only 1 peak in a tad -- no ambiguity!
-    clear_assoc,ambiguous_peaks,ambiguous_genes=get_clear_peak_gene_assoc(tad_dict)    
-
-    #if we have multiple peaks and genes in tad, need to resolve the mapping by measuring hic contact frequency
-    hic_bin_to_gene=get_hic_bin_to_gene(ambiguous_genes,args.hic_resolution)
-    print("got hic bins for genes")
-
-    hic_bin_to_peak=get_hic_bin_to_peak(ambiguous_peaks,args.hic_resolution) 
-    print("got hic bins for peaks")
-    
     #use the intersected peaks to find contact maps !
     impact_scores=get_predicted_impact(contact_map,hic_bin_to_gene,hic_bin_to_peak,peak_intersection)
 

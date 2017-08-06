@@ -39,7 +39,7 @@ def filter_motif_hits(motif_hits,topn):
                 filtered_hits[peak_entry][score_keys[i]]=all_hits[peak_entry][score_keys[i]]
             except:
                 pdb.set_trace()
-    print(str(filtered_hits))
+    print(str(len(filtered_hits)))
     return filtered_hits 
 
 def main():
@@ -47,21 +47,19 @@ def main():
     motif_hits=open(args.motif_hits,'r').read().strip().split('\n')
     filtered_motif_hits=filter_motif_hits(motif_hits,args.topn)
     predicted_score=open(args.predicted_score,'r').read().strip().split('\n')
-    predicted_score_peak_to_entry=dict()
+    outf=open(args.outf,'w')
+    outf.write('Gene\tPeak\tScore\t'+'\t'.join(['Motif_Score'+str(i)+'\t'+"Motif"+str(i) for i in range(args.topn)])+'\n')
     for line in predicted_score[1::]:
         tokens=line.split('\t')
         gene=tokens[0]
         peak=tokens[1]
-        score=str(round(float(tokens[2]),2))
-        
-        predicted_score_peak_to_entry[peak]=[gene,peak,score]
-    outf=open(args.outf,'w')
-    outf.write('Gene\tPeak\tScore\t'+'\t'.join(['Motif_Score'+str(i)+'\t'+"Motif"+str(i) for i in range(args.topn)])+'\n')
-    for peak in predicted_score_peak_to_entry:
+        score=tokens[2]
+        if score!="NA":
+            score=str(round(float(tokens[2]),2))        
         motif_hits_cur_peak=filtered_motif_hits[peak]
-        outf.write('\t'.join(predicted_score_peak_to_entry[peak]))
         keys=motif_hits_cur_peak.keys()
         keys.sort(reverse=True)
+        outf.write(line)
         for score_to_motif in keys:
             outf.write('\t'+str(round(score_to_motif,2))+'\t'+','.join(motif_hits_cur_peak[score_to_motif]))
         outf.write('\n')

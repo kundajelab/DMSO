@@ -40,7 +40,7 @@ def main():
                     random_hits+=1
             #how likely are we to see values >= to observed count in the tad?
             p_value=float(random_hits)/total 
-            outf.write('\t'.join(peak)+'\t'+str(p_value)+'\n')
+            outf.write('\t'.join(tad)+'\t'+str(p_value)+'\n')
     
 if __name__=="__main__":
     main() 
