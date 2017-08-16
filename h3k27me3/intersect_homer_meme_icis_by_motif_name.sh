@@ -1,0 +1,1 @@
+python intersect_homer_meme_icis_by_motif_name.py --homer_known_motifs homer_analysis/knownResults.txt --meme_output meme_motif_enrichment.formatted --icis_output i-cis_target_top_100.formatted.csv --outf motif_calling_comparison 
