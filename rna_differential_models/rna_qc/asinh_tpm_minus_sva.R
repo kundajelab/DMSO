@@ -56,8 +56,8 @@ comparison_names=c("earlyG1",
 #USE LIMMA ANALYSIS
 fit_tpm=contrasts.fit(fit_tpm,cont.matrix)
 e_tpm=eBayes(fit_tpm)
-library(broom)
-library(dplyr)
+#library(broom)
+#library(dplyr)
 for(contrast_index in seq(1,9))
 {
   comparison_name=unlist(comparison_names[contrast_index])
@@ -67,6 +67,7 @@ for(contrast_index in seq(1,9))
   down_genes=la_tpm$Gene[la_tpm$logFC < -0.9]
   write.table(up_genes,paste(comparison_names[contrast_index],"up",sep='.'),row.names = FALSE,col.names = FALSE,quote=FALSE)
   write.table(down_genes,paste(comparison_names[contrast_index],"down",sep='.'),row.names=FALSE,col.names=FALSE,quote=FALSE)
+  #write the full dataframe as an output
+  full_df=topTable(e_tpm,number=nrow(tpm_corrected))
+  write.table(full_df,paste(comparison_names[contrast_index],"df",sep="."),row.names=TRUE,col.names=TRUE,quote=FALSE)
 }
-
-
