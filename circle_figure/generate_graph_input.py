@@ -30,9 +30,9 @@ def main():
 
         
     outf_nodes=open(args.outf+'.node','w')
-    outf_nodes.write('nodeName\tnodeType\tnodeLabel\n') 
+    outf_nodes.write('nodeName\tnodeType\tnodeColor\tnodeLabel\n') 
     outf_edges=open(args.outf+'.edge','w')
-    outf_edges.write('fromNode\ttoNode\tdirection\n')
+    outf_edges.write('fromNode\ttoNode\tdirection\tWeight\n')
     node_dict=dict()
     node_index=0 
     for line in path_to_gene[1::]:
@@ -42,40 +42,40 @@ def main():
         genes=tokens[6].split(',')
         if pathway not in node_dict:
             node_dict[pathway]=node_index
-            outf_nodes.write(str(node_index)+'\t'+'Pathway'+'\t'+pathway+'\n') 
+            outf_nodes.write(str(node_index)+'\t'+'Pathway'+'\t'+'Pathway'+'\t'+pathway+'\n') 
             node_index+=1
         pathway_node_index=node_dict[pathway]
         for gene in genes:
             if gene not in node_dict:
                 node_dict[gene]=node_index
-                outf_nodes.write(str(node_index)+'\t'+'Gene'+'\t'+gene+'\n') 
+                outf_nodes.write(str(node_index)+'\t'+'Gene'+'\t'+'Gene'+'\t'+gene+'\n') 
                 node_index+=1                
             gene_node_index=node_dict[gene]
-            outf_edges.write(str(pathway_node_index)+'\t'+str(gene_node_index)+'\t'+'directed'+'\n')
+            outf_edges.write(str(pathway_node_index)+'\t'+str(gene_node_index)+'\t'+'directed'+'\t'+'10'+'\n')
     for line in gene_to_peak[1::]:
         tokens=line.split('\t')
         gene=tokens[0]
         if gene not in node_dict:
             node_dict[gene]=node_index
-            outf_nodes.write(str(node_index)+'\t'+'Gene'+'\t'+gene+'\n')
+            outf_nodes.write(str(node_index)+'\t'+'Gene'+'\t'+'Gene'+'\t'+gene+'\n')
             node_index+=1
         gene_node_index=node_dict[gene]
         peak=tokens[1]
         if peak not in node_dict:
             node_dict[peak]=node_index
-            outf_nodes.write(str(node_index)+'\t'+chrom_hmm_dict[peak]+'\t'+peak+'\n')
+            outf_nodes.write(str(node_index)+'\t'+'Peak'+'\t'+chrom_hmm_dict[peak]+'\t'+peak+'\n')
             node_index+=1
         peak_node_index=node_dict[peak]
-        outf_edges.write(str(gene_node_index)+'\t'+str(peak_node_index)+'\t'+'directed'+'\n')
+        outf_edges.write(str(gene_node_index)+'\t'+str(peak_node_index)+'\t'+'directed'+'\t'+'5'+'\n')
         if len(tokens)<5:
             continue 
         motif=tokens[4]
         if motif not in node_dict:
             node_dict[motif]=node_index
-            outf_nodes.write(str(node_index)+'\t'+'Motif'+'\t'+motif+'\n')
+            outf_nodes.write(str(node_index)+'\t'+'Motif'+'\t'+'Motif'+'\t'+motif+'\n')
             node_index+=1
         motif_node_index=node_dict[motif]
-        outf_edges.write(str(peak_node_index)+'\t'+str(motif_node_index)+'\t'+'directed'+'\n')
+        outf_edges.write(str(peak_node_index)+'\t'+str(motif_node_index)+'\t'+'directed'+'\t'+'2'+'\n')
         
         
         
