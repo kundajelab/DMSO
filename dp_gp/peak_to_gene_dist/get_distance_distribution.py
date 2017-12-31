@@ -1,5 +1,6 @@
 #compare distribution of peak-gene distances in same cluster vs. peak-gene distances to other clusters.
 from pybedtools import BedTool
+threshold=1000000
 def get_background(to_exclude):
     peak_background=""
     gene_background=""    
@@ -22,17 +23,19 @@ for cluster in range(1,7):
     #get the background
     peak_background,gene_background=get_background(cluster)
     #peak to gene closest, cur cluster
-    peak_to_gene_foreground=[int(str(i).strip().split('\t')[-1]) for i in peak_bed.closest(gene_bed,wao=True,d=True)]
+    peak_to_gene_foreground=[int(str(i).strip().split('\t')[-1]) for i in peak_bed.closest(gene_bed,wao=True,d=True,t="first")]
     #gene to peak closest, cur cluster
-    gene_to_peak_foreground=[int(str(i).strip().split('\t')[-1]) for i in gene_bed.closest(peak_bed,wao=True,d=True)]
+    gene_to_peak_foreground=[int(str(i).strip().split('\t')[-1]) for i in gene_bed.closest(peak_bed,wao=True,d=True,t="first")]
     #peak to gene closest, background
-    peak_to_gene_background=[int(str(i).strip().split('\t')[-1]) for i in peak_bed.closest(gene_background,wao=True,d=True)]
+    peak_to_gene_background=[int(str(i).strip().split('\t')[-1]) for i in peak_bed.closest(gene_background,wao=True,d=True,t="first")]
     #gene to peak closest, background
-    gene_to_peak_background=[int(str(i).strip().split('\t')[-1]) for i in gene_bed.closest(peak_background,wao=True,d=True)]
+    gene_to_peak_background=[int(str(i).strip().split('\t')[-1]) for i in gene_bed.closest(peak_background,wao=True,d=True,t="first")]
     print("got closest values for cluster "+str(cluster))
     #append the peak and gene distances to consider them in a single distribution
     foreground=peak_to_gene_foreground+gene_to_peak_foreground
     background=peak_to_gene_background+gene_to_peak_background
+    foreground=[foreground[i] for i in range(len(foreground)) if foreground[i]<threshold]
+    background=[background[i] for i in range(len(background)) if background[i]<threshold]
     print(str(len(foreground)))
     print(str(len(background)))
     outf=open(str(cluster)+'.dist','w')
