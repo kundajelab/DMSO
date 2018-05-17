@@ -1,5 +1,5 @@
 rm(list=ls())
-data=read.table("rsem.differentiation.txt",header=TRUE,sep='\t',stringsAsFactors = FALSE)
+data=read.table("rsem.cellcycle.txt",header=TRUE,sep='\t',stringsAsFactors = FALSE)
 genes=data$Gene
 data$Gene=NULL
 data=asinh(data)
@@ -11,7 +11,7 @@ heatmap.2(data,
           col=bluered(50),
           symbreaks=FALSE,
           dendrogram = "none",
-          main="Differentiation Genes (GO:0030154)",
+          main="Cell Cycle Genes (GO:0007049)",
           labRow="",
           density.info = "none",
           trace="none",

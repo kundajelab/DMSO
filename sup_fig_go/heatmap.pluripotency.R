@@ -7,7 +7,7 @@ data=as.matrix(data)
 library(gplots)
 heatmap.2(data,
           Rowv=TRUE,
-          Colv=TRUE,
+          Colv=FALSE,
           col=bluered(50),
           symbreaks=FALSE,
           dendrogram = "none",
@@ -16,4 +16,8 @@ heatmap.2(data,
           density.info = "none",
           trace="none",
           scale="none",
+          colsep=seq(0,ncol(data)),
+          rowsep=c(0,nrow(data)),
+          sepwidth = c(0.01,0.05),
+          sepcolor = "black",
           margins=c(10,5))
