@@ -7,7 +7,7 @@ library(bladderbatch)
 library(snpStats)
 library(data.table)
 
-data=data.frame(read.table('atacseq_merged.txt',header=TRUE,sep='\t'))
+data=data.frame(read.table('../atacseq_merged.txt',header=TRUE,sep='\t'))
 chrom=data$Chrom
 start_pos=data$Start
 end_pos=data$End
@@ -21,6 +21,7 @@ batches=data.frame(read.table('atacseq_batches.txt',header=TRUE,sep='\t'))
 #pc1 is weird -- no correspondence to DMSO vs Control or Timepoint , need to perform SVA
 
 mod1=model.matrix(~0+Treatment+Timepoint,data=batches)
+browser() 
 mod0=model.matrix(~1,data=batches)
 v=voom(counts=data,design=mod1)
 #sva 

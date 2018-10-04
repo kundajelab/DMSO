@@ -111,14 +111,31 @@ def get_transition_matrix_cluster(h3k27ac,h3k4me3,h3k27me3,diff_dict,cluster_ind
             transition_mat[start_state][end_state]=1
         else:
             transition_mat[start_state][end_state]+=1
-    outf=open("chipseq_transition_matrix_"+str(cluster_index)+".txt",'w')
-    start_states=list(start_states)
-    end_states=list(end_states)
-    outf.write('\t'+'\t'.join([str(i) for i in end_states])+'\n')
-    for s in start_states:
-        outf.write(str(s))
-        for e in end_states:
-            if e in transition_mat[s]:
+    states=[(0,1,0),
+            (1,0,0),
+            (1,1,0),
+            (0,1,1),
+            (0,0,1),
+            (0,0,0),
+            (1,0,1),
+            (1,1,1)]
+    state_dict=dict()
+    state_dict[(0,1,0)]="H3k4me3"
+    state_dict[(1,0,0)]="H3k27ac"
+    state_dict[(1,1,0)]="H3k27ac/H3k4me3"
+    state_dict[(0,1,1)]="H3k4me3/H3k27me3"
+    state_dict[(0,0,1)]="H3k27me3"
+    state_dict[(0,0,0)]="None"
+    state_dict[(1,0,1)]="H3k27ac/H3k27me3"
+    state_dict[(1,1,1)]="H3k27ac/H3k4me3/H3k27me3"
+    #print(str(end_states))
+    #print(str(end_states))
+    outf=open("chipseq_transition_matrix_"+str(cluster_index)+".full.txt",'w')
+    outf.write('\t'+'\t'.join([state_dict[i] for i in states])+'\n')
+    for s in states:
+        outf.write(str(state_dict[s]))
+        for e in states:
+            if ((s in transition_mat) and (e in transition_mat[s])):
                 outf.write('\t'+str(transition_mat[s][e]))
             else:
                 outf.write('\t0')
@@ -204,19 +221,32 @@ def get_transition_matrix_global(h3k27ac,h3k4me3,h3k27me3,diff_dict):
             transition_mat[start_state][end_state]=1
         else:
             transition_mat[start_state][end_state]+=1
-    if (cluster_specific==False):
-        outf=open("chipseq_transition_matrix_global.txt",'w')
-    else:
-        outf=open("chipseq_transition_matrix_"+str(cluster_index)+".txt",'w')
-    start_states=list(start_states)
-    end_states=list(end_states)
+    outf=open("chipseq_transition_matrix_global.txt",'w')
+    states=[(0,1,0),
+            (1,0,0),
+            (1,1,0),
+            (0,1,1),
+            (0,0,1),
+            (0,0,0),
+            (1,0,1)
+            (1,1,1)]
+    state_dict=dict()
+    state_dict[(0,1,0)]="H3k4me3"
+    state_dict[(1,0,0)]="H3k27ac"
+    state_dict[(1,1,0)]="H3k27ac/H3k4me3"
+    state_dict[(0,1,1)]="H3k4me3/H3k27me3"
+    state_dict[(0,0,1)]="H3k27me3"
+    state_dict[(0,0,0)]="None"
+    state_dict[(1,0,1)]="H3k27ac/H3k27me3"
+    state_dict[(1,1,1)]="H3k27ac/H3k4me3/H3k27me3"
+    
     #print(str(end_states))
     #print(str(end_states))
-    outf.write('\t'+'\t'.join([str(i) for i in end_states])+'\n')
-    for s in start_states:
-        outf.write(str(s))
-        for e in end_states:
-            if e in transition_mat[s]:
+    outf.write('\t'+'\t'.join([state_dict[i] for i in states])+'\n')
+    for s in states:
+        outf.write(str(state_dict[s]))
+        for e in states:
+            if ((s in transition_mat) and (e in transition_mat[s])):
                 outf.write('\t'+str(transition_mat[s][e]))
             else:
                 outf.write('\t0')

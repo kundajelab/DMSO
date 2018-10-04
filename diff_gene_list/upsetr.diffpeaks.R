@@ -1,0 +1,5 @@
+rm(list=ls())
+library(UpSetR)
+data=read.table("upsetr.gene.input.txt",header=TRUE,sep='\t',row.names=1)
+data=abs(data)
+upset(data,order.by="freq",nsets=6)

@@ -1,12 +1,16 @@
 rm(list=ls())
 library(ggplot2)
 library(limma)
-library(edgeR)
-library(DESeq2)
+#library(edgeR)
+#library(DESeq2)
 library(sva)
 library(gplots)
 #import data 
-tpm=read.table("rsem.tpm.csv",header=TRUE,sep='\t',row.names=1)
+tpm=read.table("~/nandi/new_RSEM/rsem.genes.tpm.filtered",header=TRUE,sep='\t',row.names=1)
+#tpm=read.table("~/nandi/new_kallisto/kallisto.genes.txt",header=TRUE,sep='\t',row.names=1)
+#rownames(tpm)=paste(tpm$ID,tpm$GENE,sep='_')
+#tpm$ID=NULL
+#tpm$GENE=NULL
 all_zero_indices=which(rowSums(tpm)==0)
 tpm=tpm[-all_zero_indices,]
 tpm=asinh(tpm)
@@ -22,11 +26,14 @@ sva_tpm=data.frame(sva_tpm$sv)
 batches$sva1=sva_tpm$X1
 batches$sva2=sva_tpm$X2
 batches$sva3=sva_tpm$X3
+#batches$sva4=sva_tpm$X4
 #add in surrogate variables into the model matrix
 mod3=model.matrix(~0+Sample+sva1+sva2+sva3,data=batches)
+#mod3=model.matrix(~0+Sample+sva1+sva2+sva3+sva4,data=batches)
 fit2 <- lmFit(as.matrix(tpm), mod3)
 #subtract the SV contribs
 sv_contribs=coefficients(fit2)[,c(7,8,9)] %*% t(fit2$design[,c(7,8,9)])
+#sv_contribs=coefficients(fit2)[,c(7,8,9,10)] %*% t(fit2$design[,c(7,8,9,10)])
 tpm_corrected=na.omit(tpm-sv_contribs) 
 
 mod_final=model.matrix(~0+Sample,data=batches)
@@ -61,13 +68,15 @@ e_tpm=eBayes(fit_tpm)
 for(contrast_index in seq(1,9))
 {
   comparison_name=unlist(comparison_names[contrast_index])
-  la_tpm=topTable(e_tpm,number=nrow(tpm_corrected),coef=contrast_index,p.value = 0.05,lfc = 1)
+  la_tpm=topTable(e_tpm,number=nrow(tpm_corrected),coef=contrast_index,p.value = 0.01)
   la_tpm$Gene=rownames(la_tpm)
-  up_genes=la_tpm$Gene[la_tpm$logFC > 0.9]
-  down_genes=la_tpm$Gene[la_tpm$logFC < -0.9]
+  up_genes=la_tpm$Gene[la_tpm$logFC >0.5]
+  down_genes=la_tpm$Gene[la_tpm$logFC < -0.5]
   write.table(up_genes,paste(comparison_names[contrast_index],"up",sep='.'),row.names = FALSE,col.names = FALSE,quote=FALSE)
   write.table(down_genes,paste(comparison_names[contrast_index],"down",sep='.'),row.names=FALSE,col.names=FALSE,quote=FALSE)
   #write the full dataframe as an output
   full_df=topTable(e_tpm,number=nrow(tpm_corrected))
   write.table(full_df,paste(comparison_names[contrast_index],"df",sep="."),row.names=TRUE,col.names=TRUE,quote=FALSE)
 }
+write.table(tpm_corrected,"new_RSEM.tpm.corrected",row.names=TRUE,col.names=TRUE,quote=FALSE)
+#write.table(tpm_corrected,"new_Kallisto.tpm.corrected",row.names=TRUE,col.names=TRUE,quote=FALSE)

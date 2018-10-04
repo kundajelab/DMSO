@@ -2,7 +2,7 @@ import sys
 import numpy as np
 data=open(sys.argv[1],'r').read().strip().split('\n')
 outf=open(sys.argv[2],'w') 
-for line in data:
+for line in data[1::]:
     tokens=line.split('\t')
     if len(tokens)==0:
         continue

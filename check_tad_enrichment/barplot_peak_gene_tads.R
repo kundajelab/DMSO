@@ -1,0 +1,12 @@
+rm(list=ls())
+data=read.table("diff_peaks_genes_same_tad.tsv",header=TRUE,sep='\t')
+library(ggplot2)
+data$Group=factor(data$Group,levels=c("Distal","Adjacent","Same"))
+ggplot(data=data,
+       aes(x=data$Data,
+           y=data$Percent,
+           group=data$Group,
+           fill=data$Group))+
+  geom_bar(position="stack",stat="identity")+
+  scale_fill_manual(values=c("#7570b3","#d95f02","#1b9e77"),name="Tad")+
+  theme_bw(20)
