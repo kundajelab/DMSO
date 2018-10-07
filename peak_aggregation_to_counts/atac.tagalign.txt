@@ -1,0 +1,12 @@
+SG2M_controls_Rep1	/oak/stanford/groups/akundaje/annashch/dmso_batch1/reprocessed/SG2M_R2_controls/out/align/rep1/H9_Fucci_SG2M_R2_C1_S43_L005_R1_001.PE2SE.nodup.tn5.no_chrM.25M.R1.tagAlign.gz
+SG2M_controls_Rep2	/oak/stanford/groups/akundaje/annashch/dmso_batch1/reprocessed/SG2M_R2_controls/out/align/rep2/H9_Fucci_SG2M_R2_C2_S44_L005_R1_001.PE2SE.nodup.tn5.no_chrM.25M.R1.tagAlign.gz
+SG2M_DMSO_Rep1	/oak/stanford/groups/akundaje/annashch/dmso_batch1/reprocessed/SG2M_R2_dmso/out/align/rep1/H9_Fucci_SG2M_R2_D1_S45_L005_R1_001.PE2SE.nodup.tn5.no_chrM.25M.R1.tagAlign.gz
+SG2M_DMSO_Rep2	/oak/stanford/groups/akundaje/annashch/dmso_batch1/reprocessed/SG2M_R2_dmso/out/align/rep2/H9_Fucci_SG2M_R2_D2_S46_L005_R1_001.PE2SE.nodup.tn5.no_chrM.25M.R1.tagAlign.gz
+earlyG1_controls_Rep1	/oak/stanford/groups/akundaje/annashch/dmso_batch1/reprocessed/earlyG1_R2_controls/out/align/rep1/H9_Fucci_earlyG1_R2_C1_S35_L005_R1_001.PE2SE.nodup.tn5.no_chrM.25M.R1.tagAlign.gz
+earlyG1_controls_Rep2	/oak/stanford/groups/akundaje/annashch/dmso_batch1/reprocessed/earlyG1_R2_controls/out/align/rep2/H9_Fucci_earlyG1_R2_C2_S36_L005_R1_001.PE2SE.nodup.tn5.no_chrM.25M.R1.tagAlign.gz
+earlyG1_DMSO_Rep1	/oak/stanford/groups/akundaje/annashch/dmso_batch1/reprocessed/earlyG1_R2_dmso/out/align/rep1/H9_Fucci_earlyG1_R2_D1_S37_L005_R1_001.PE2SE.nodup.tn5.no_chrM.25M.R1.tagAlign.gz
+earlyG1_DMSO_Rep2	/oak/stanford/groups/akundaje/annashch/dmso_batch1/reprocessed/earlyG1_R2_dmso/out/align/rep2/H9_Fucci_earlyG1_R2_D2_S38_L005_R1_001.PE2SE.nodup.tn5.no_chrM.25M.R1.tagAlign.gz
+lateG1_DMSO_Rep1	/oak/stanford/groups/akundaje/annashch/dmso_batch1/reprocessed/lateG1_R2_dmso/out/align/rep1/H9_Fucci_LateG1_R2_D1_S41_L005_R1_001.PE2SE.nodup.tn5.no_chrM.25M.R1.tagAlign.gz
+lateG1_DMSO_Rep2	/oak/stanford/groups/akundaje/annashch/dmso_batch1/reprocessed/lateG1_R2_dmso/out/align/rep2/H9_Fucci_LateG1_R2_D2_S42_L005_R1_001.PE2SE.nodup.tn5.no_chrM.25M.R1.tagAlign.gz
+lateG1_controls_Rep1	/oak/stanford/groups/akundaje/annashch/dmso_batch1/reprocessed/lateG1_R2_controls/out/align/rep1/H9_Fucci_LateG1_R2_C1_S39_L005_R1_001.PE2SE.nodup.tn5.no_chrM.25M.R1.tagAlign.gz
+lateG1_controls_Rep2	/oak/stanford/groups/akundaje/annashch/dmso_batch1/reprocessed/lateG1_R2_controls/out/align/rep2/H9_Fucci_LateG1_R2_C2_S40_L005_R1_001.PE2SE.nodup.tn5.no_chrM.25M.R1.tagAlign.gz

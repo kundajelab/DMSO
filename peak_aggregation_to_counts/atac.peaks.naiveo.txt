@@ -1,0 +1,6 @@
+SG2M_R2_controls	/oak/stanford/groups/akundaje/annashch/dmso_batch1/reprocessed/SG2M_R2_controls/out/peak/macs2/overlap/optimal_set/SG2M_R2_controls_ppr.naive_overlap.filt.narrowPeak.gz
+SG2M_R2_DMSO		/oak/stanford/groups/akundaje/annashch/dmso_batch1/reprocessed/SG2M_R2_dmso/out/peak/macs2/overlap/optimal_set/SG2M_R2_treated_ppr.naive_overlap.filt.narrowPeak.gz
+earlyG1_R2_controls	/oak/stanford/groups/akundaje/annashch/dmso_batch1/reprocessed/earlyG1_R2_controls/out/peak/macs2/overlap/optimal_set/earlyG1_R2_controls_ppr.naive_overlap.filt.narrowPeak.gz
+earlyG1_R2_DMSO		/oak/stanford/groups/akundaje/annashch/dmso_batch1/reprocessed/earlyG1_R2_dmso/out/peak/macs2/overlap/optimal_set/earlyG1_R2_treated_ppr.naive_overlap.filt.narrowPeak.gz
+lateG1_R2_DMSO		/oak/stanford/groups/akundaje/annashch/dmso_batch1/reprocessed/lateG1_R2_dmso/out/peak/macs2/overlap/optimal_set/lateG1_R2_treated_ppr.naive_overlap.filt.narrowPeak.gz
+lateG1_R2_controls	/oak/stanford/groups/akundaje/annashch/dmso_batch1/reprocessed/lateG1_R2_controls/out/peak/macs2/overlap/optimal_set/lateG1_R2_controls_ppr.naive_overlap.filt.narrowPeak.gz
