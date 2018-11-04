@@ -1,0 +1,5 @@
+data=open('norm_factors.txt','r').read().strip().split('\n')
+outf=open('tmp.txt','w')
+outf.write(data[0]+'\n')
+outf.write('\n'.join([data[1]]*160698))
+outf.close()     

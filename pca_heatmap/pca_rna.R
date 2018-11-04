@@ -6,13 +6,13 @@ library(data.table)
 #data=data.frame(read.table('rsem.results.filtered',header=TRUE,sep='\t'))
 
 #NEW RSEM 
-data=data.frame(read.table('~/nandi/new_RSEM/new_RSEM.tpm.corrected',header=TRUE,sep='\t',row.names = 1))
+data=data.frame(read.table('~/nandi/new_kallisto/new_Kallisto.tpm.corrected',header=TRUE,sep='\t',row.names = 1))
 #data$GENE=NULL
 
 #NEW KALLISTO 
 #data=data.frame(read.table('~/nandi/new_kallisto/new_Kallisto.tpm.corrected',header=TRUE,sep='\t',row.names = 1))
 
-data.pca=prcomp(t(data),center=FALSE,scale=FALSE)
+data.pca=prcomp(t(data),center=TRUE,scale=TRUE)
 barplot(100*data.pca$sdev^2/sum(data.pca$sdev^2),width=1,xlim=c(0,13),ylim=c(0,100),xlab="PC",ylab="% Variance Explained")
 text(1:12,100*data.pca$sdev^2/sum(data.pca$sdev^2),labels=round(100*data.pca$sdev^2/sum(data.pca$sdev^2),2))
 groups=factor(rownames(data.pca$x))

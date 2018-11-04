@@ -1,80 +1,48 @@
 rm(list=ls())
-#library(ggbiplot)
-library(data.table)
-#data=data.frame(read.table('presence_tasks_stringent.txt',header=T,sep='\t'))
-#data=data.frame(read.table('macs.fc.averaged.tab',header=T,sep='\t'))
-#data$Chrom=NULL
-#data$Start=NULL 
-#data$End=NULL 
-data=data.frame(read.table('atac_corrected.csv',header=T,sep='\t'))
-data$ID=NULL
+source('helpers.R')
+library(ggplot2)
+
+data=read.table("normcounts_from_deseq.txt",header=TRUE,sep='\t',row.names=1)
+
+batches=read.table("atacseq_batches_truerep.txt",header=TRUE,sep='\t')
+batches$Sample=factor(batches$Sample)
+batches$CellCycle=factor(batches$CellCycle)
+batches$Treatment=factor(batches$Treatment)
+
 data.pca=prcomp(t(data),center=FALSE,scale=FALSE)
-barplot(100*data.pca$sdev^2/sum(data.pca$sdev^2),las=2,xlab="",ylab="% Variance Explained")
-
-groups=factor(rownames(data.pca$x))
-
-#PC1 vs PC2
-dense_groups=factor(c("U","U","U","U","HD","HD","HD","HD","LD","LD","LD","LD",
-              "HD","HD","HD","HD","LD","LD","LD","LD",
-              "HD","HD","HD","HD","LD","LD","LD","LD",
-	            "LD","LD"))
-batches=factor(c(1,1,1,1,
-                 2,2,2,2,2,2,2,2,
-                 2,2,2,2,2,2,2,2,
-                 2,2,2,2,2,2,2,2,
-                 3,3))
-control_treated_groups=factor(c(1,1,2,2,
-				1,1,2,2,1,1,2,2,
-                                1,1,2,2,1,1,2,2,
-                                1,1,2,2,1,1,2,2,
-				1,2))
-
-#plot(data.pca$x[,c(1,2)],col=dense_groups,pch=16)
-#text(data.pca$x[,c(1,2)],labels=groups,pos=3,cex=0.5)
-#title("PC1 vs PC2 separates HD (high density) and LD (low density) samples")
-
-plot(data.pca$x[,c(1,2)],col=batches,pch=16)
-text(data.pca$x[,c(1,2)],labels=groups,pos=3,cex=0.5)
-title("PC1 vs PC2")
-plot(data.pca$x[,c(1,3)],col=batches,pch=16)
-text(data.pca$x[,c(1,3)],labels=groups,pos=3,cex=0.5)
-title("PC1 vs PC3")
-plot(data.pca$x[,c(2,3)],col=batches,pch=16)
-text(data.pca$x[,c(2,3)],labels=groups,pos=3,cex=0.5)
-title("PC2 vs PC3")
-browser() 
-
-#PC2 vs PC3
-dense_treatment_groups=factor(c("Co_U","Co_U","Tr_U","Tr_U",
-				"Co_HD","Co_HD","Tr_HD","Tr_HD","Co_LD","Co_LD","Tr_LD","Tr_LD",
-                                "Co_HD","Co_HD","Tr_HD","Tr_HD","Co_LD","Co_LD","Tr_LD","Tr_LD",
-                                "Co_HD","Co_HD","Tr_HD","Tr_HD","Co_LD","Co_LD","Tr_LD","Tr_LD",
-				"Co_LD","Tr_LD"))
-plot(data.pca$x[,c(2,3)],col=dense_treatment_groups,pch=16)
-text(data.pca$x[,c(2,3)],labels=groups,pos=3,cex=0.5)
-title('PC2 vs PC3 separates 4 clusters: Control/HD, Control/LD, Treated/HD, Treated/LD')
-
-#PC1 vs PC3
-#time_groups=factor(c("earlyG1","earlyG1","earlyG1","earlyG1","earlyG1","earlyG1","earlyG1","earlyG1",
-#                   "lateG1","lateG1","lateG1","lateG1","lateG1","lateG1","lateG1","lateG1",
-#                   "SG2M","SG2M","SG2M","SG2M","SG2M","SG2M","SG2M","SG2M"))
-time_groups=factor(c(0,0,0,0,
-		     1,1,1,1,1,1,1,1,
-                     2,2,2,2,2,2,2,2,
-                     3,3,3,3,3,3,3,3,
-		     0,0))
-plot(data.pca$x[,c(1,3)],col=control_treated_groups,pch = 16)
-text(data.pca$x[,c(1,3)],labels=groups,pos=3,cex=0.5)
-title("PC1 vs PC3")
-
-#PC2 vs PC4
-plot(data.pca$x[,c(2,4)],col=time_groups,pch = 16)
-text(data.pca$x[,c(2,4)],labels=groups,pos=3,cex=0.5)
-title("PC2 vs PC4") 
-#title("Component 4 separates samples by cell cycle timepoint, component 2 separates samples by cell density")
+barplot(100*data.pca$sdev^2/sum(data.pca$sdev^2),width=1,xlim=c(0,13),ylim=c(0,100),xlab="PC",ylab="% Variance Explained")
+text(1:12,100*data.pca$sdev^2/sum(data.pca$sdev^2),labels=round(100*data.pca$sdev^2/sum(data.pca$sdev^2),2))
 
 
-plot(data.pca$x[,c(2,5)],col=time_groups,pch = 16)
-text(data.pca$x[,c(2,5)],labels=groups,pos=3,cex=0.5)
-title("PC2 vs PC5") 
-#title("PC4 separates samples by cell cycle timepoint; PC3 separates samples by Treated vs Control")
+#ggplot pca fig
+pca_df=as.data.frame(data.pca$x)
+pca_df=cbind(pca_df,batches)
+
+p1=ggplot(data=pca_df,aes(x=pca_df$PC1,y=pca_df$PC2,color=pca_df$CellCycle,shape=pca_df$Treatment))+
+  geom_point(show.legend=TRUE,size=5) +
+  xlab("PC1: 95.77%")+
+  ylab("PC2: 1.35%")+
+  scale_shape_discrete(name="DMSO vs Control")+
+  scale_color_manual(name = "Cell Cycle Phase",values = c("#7570b3", "#d95f02", "#1b9e77"))+
+  theme(legend.position="none")
+
+
+p2=ggplot(data=pca_df,aes(x=pca_df$PC2,y=pca_df$PC3,color=pca_df$CellCycle,shape=pca_df$Treatment))+
+  geom_point(show.legend=TRUE,size=5) +
+  xlab("PC2: 1.35%")+
+  ylab("PC3: 0.94%")+
+  scale_shape_discrete(name="DMSO vs Control")+
+  scale_color_manual(name = "Cell Cycle Phase",values = c("#7570b3", "#d95f02", "#1b9e77"))+
+  theme(legend.position="none")
+
+p3=ggplot(data=pca_df,aes(x=pca_df$PC1,y=pca_df$PC3,color=pca_df$CellCycle,shape=pca_df$Treatment))+
+  geom_point(show.legend=TRUE,size=5) +
+  xlab("PC1: 95.77%")+
+  ylab("PC3: 0.94%")+
+  scale_shape_discrete(name="DMSO vs Control")+
+  scale_color_manual(name = "Cell Cycle Phase",values = c("#7570b3", "#d95f02", "#1b9e77"))+
+  theme(legend.position="none")
+
+multiplot(p1,p2,p3,cols=1)
+
+
