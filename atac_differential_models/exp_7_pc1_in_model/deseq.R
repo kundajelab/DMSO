@@ -14,16 +14,26 @@ data$Chrom=NULL
 data$Start=NULL
 data$End=NULL
 
+
+
+
 #load the metadata 
 batches=read.table("../atacseq_batches_truerep.txt",header=TRUE,sep='\t',row.names=1)
 batches$CellCycle=factor(batches$CellCycle)
 batches$Treatment=factor(batches$Treatment)
 batches$Sample=factor(batches$Sample)
 
+
+#Perform PCA analysis on the data
+data.pca=prcomp(t(data),center=FALSE,scale=TRUE)
+pca_df=as.data.frame(data.pca$x)
+batches=cbind(pca_df,batches)
+
+
 #Create DESeq object 
 dds <- DESeqDataSetFromMatrix(countData = data,
                               colData = batches,
-			      design = ~CellCycle + CellCycle:Treatment)
+			      design = ~CellCycle + CellCycle:Treatment +PC1)
 
 #perform size factor normalization for HK promoters
 hk_promoters=read.table("HK.promoters.txt",header=TRUE,sep='\t')
@@ -38,6 +48,8 @@ dds <- DESeq(dds,parallel = parallelFlag)
 
 #extract the normalized counts for purposes of PCA & heatmap
 normcounts=counts(dds,normalized=TRUE)
+mod1=model.matrix(~ Treatment + CellCycle,data=batches)
+normcounts=removeBatchEffect(normcounts,design=mod1,covariates=batches[c("PC1")])
 write.table(normcounts,"normcounts_from_deseq2.txt",quote=FALSE,sep='\t',col.names=TRUE,row.names=TRUE)
 
 #get the results for various contrasts
