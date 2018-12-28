@@ -1,11 +1,12 @@
 rm(list=ls())
 library(ggplot2)
+library(DESeq2) 
 library(limma)
 library(sva)
 library(dplyr)
 
 #get the design matrix 
-batches=data.frame(read.table('atacseq_batches.txt',header=TRUE,sep='\t'))
+batches=data.frame(read.table('atacseq_batches_pseudorep.txt',header=TRUE,sep='\t'))
 mod1=model.matrix(~0+Treatment+Timepoint,data=batches)
 mod0=model.matrix(~1,data=batches)
 #import data 
@@ -21,7 +22,7 @@ groups=colnames(counts)
 #rlogTransform on the data 
 #This function transform the count data to the log2 scale in a way which minimizes differences between samples 
 #for rows with small counts, and which normalizes with respect to library size. 
-rlog_counts=rlogTransformation(as.matrix(counts))
+rlog_counts=rlog(as.matrix(counts))
 rownames(rlog_counts)=rownames(counts)
 pca.original=prcomp(t(rlog_counts))
 barplot(100*pca.original$sdev^2/sum(pca.original$sdev^2),las=2,xlab="",ylab="% Variance Explained")

@@ -29,6 +29,9 @@ def main():
         outf.write(row_name) 
         cur_numer=[float(tokens[i]) for i in numer]
         cur_denom=[float(tokens[i]) for i in denom]
+        #add a pseudocount
+        cur_numer=[max(1,i) for i in cur_numer]
+        cur_denom=[max(1,i) for i in cur_denom]
         ratio=[]
         for i in range(len(cur_numer)):
             if cur_denom[i]==0:

@@ -14,7 +14,7 @@ data=as.matrix(data)
 data[data>5]=5
 data[data< -5]=-5
 hmcols<-colorRampPalette(c("#91bfdb","#ffffbf","#fc8d59"))(50)
-
+svg("tmp.svg",height=20,width=5)
 h=heatmap.2(as.matrix(data),
             col=hmcols,
             Rowv=TRUE,
@@ -27,5 +27,5 @@ h=heatmap.2(as.matrix(data),
             dendrogram="none",
             cexCol=0.8,
             cexRow=0.8,
-            labRow="",
             main="Pluripotency Genes (GO:0019827)")
+dev.off() 
