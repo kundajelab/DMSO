@@ -16,7 +16,6 @@ data=data.drop(['c.earlyG1.1','c.earlyG1.2','t.earlyG1.1','t.earlyG1.2','c.lateG
 
 #get stdev control and DMSO
 import numpy as np
-pdb.set_trace() 
 data['control_std']=data[['earlyG1.c','lateG1.c','SG2M.c']].std(axis=1)
 data['dmso_std']=data[['earlyG1.t','lateG1.t','SG2M.t']].std(axis=1)
 data=data.drop(["earlyG1.c","lateG1.c","SG2M.c","earlyG1.t","lateG1.t","SG2M.t"],axis=1)
